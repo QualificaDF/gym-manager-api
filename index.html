@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Manager - Sistema de Gerenciamento</title>
+    <link rel="icon" href="/favicon-lannister.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #0099cc;
+            --secondary: #ff006e;
+            --accent: #8338ec;
+            --bg-dark: #0a0e27;
+            --bg-darker: #050812;
+            --bg-card: #16213e;
+            --text-main: #e8e8e8;
+            --text-secondary: #b0b0b0;
+            --border: #2a3a5f;
+            --success: #00d97e;
+            --warning: #ffa500;
+            --error: #ff4757;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: slideDown 0.6s ease-out;
+            position: relative;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, rgba(255, 107, 53, 0.1) 0%, transparent 100%);
+            border-radius: 20px;
+            border: 2px solid #ff6b35;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15);
+        }
+
+        header h1 {
+            font-size: 3.2em;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #ffc637 0%, #ff6b35 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        header p {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .token-section {
+            background: var(--bg-card);
+            border: 2px solid #ff6b35;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(255, 107, 53, 0.15);
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .token-section h3 {
+            color: #ffc637;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .token-input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .token-input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            background: var(--bg-darker);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .token-input-group input:focus {
+            outline: none;
+            border-color: #ffc637;
+            box-shadow: 0 0 20px rgba(255, 198, 55, 0.3);
+        }
+
+        .token-input-group input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out forwards;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+        .card:nth-child(5) { animation-delay: 0.4s; }
+
+        .card:hover {
+            transform: translateY(-12px);
+            border-color: #ff6b35;
+            box-shadow: 0 20px 50px rgba(255, 107, 53, 0.25);
+        }
+
+        .card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card h2 {
+            color: #ffc637;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-darker);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffc637;
+            box-shadow: 0 0 15px rgba(255, 198, 55, 0.3);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #ffc637 0%, #ff6b35 100%);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: left 0.3s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.5);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #00a85f 100%);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, var(--error) 0%, #ff1a4d 100%);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            animation: slideDown 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: rgba(0, 217, 126, 0.1);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(255, 71, 87, 0.1);
+            border-left-color: var(--error);
+            color: var(--error);
+        }
+
+        .alert-info {
+            background: rgba(0, 212, 255, 0.1);
+            border-left-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .students-list {
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .students-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .students-list::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+        }
+
+        .students-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .student-item {
+            background: var(--bg-darker);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--primary);
+            animation: fadeInUp 0.3s ease-out;
+            transition: all 0.3s;
+            border: 2px solid var(--border);
+        }
+
+        .student-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .student-item h4 {
+            color: #ffc637;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.85em;
+        }
+
+        .info-field {
+            background: var(--bg-card);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--secondary);
+            display: block;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            color: var(--text-main);
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .student-actions button {
+            flex: 1;
+            min-width: 100px;
+            padding: 8px 12px;
+            font-size: 0.85em;
+        }
+
+        .imc-badge {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid;
+        }
+
+        .imc-normal {
+            background: rgba(0, 217, 126, 0.2);
+            color: var(--success);
+            border-color: var(--success);
+        }
+
+        .imc-overweight {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning);
+            border-color: var(--warning);
+        }
+
+        .imc-obesity {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        .imc-underweight {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .stat-box {
+            padding: 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: var(--bg-dark);
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .stat-box h3 {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+            font-weight: 800;
+        }
+
+        .stat-box p {
+            font-size: 0.95em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        small {
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .student-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚔️ ACADEMIA LANNISTER ⚔️</h1>
+            <p>GESTÃO PROFISSIONAL DE ACADEMIA</p>
+        </header>
+
+        <!-- Seção de Token -->
+        <div class="token-section">
+            <h3>🔐 Autenticação</h3>
+            <div class="token-input-group">
+                <input type="password" id="apiToken" placeholder="Cole seu token de API aqui...">
+                <button onclick="salvarToken()" style="max-width: 150px;">Definir Token</button>
+            </div>
+            <small>✨ O token será armazenado localmente no seu navegador para facilitar o acesso.</small>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Card 1: Cadastrar Aluno -->
+            <div class="card">
+                <h2>📝 Novo Aluno</h2>
+                <form onsubmit="criarAluno(event)">
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" id="nomeAluno" placeholder="João Silva..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso (kg)</label>
+                        <input type="number" id="pesoAluno" placeholder="75" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Altura (m)</label>
+                        <input type="number" id="alturaAluno" placeholder="1.80" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Plano</label>
+                        <select id="planoAluno" required>
+                            <option value="">Selecione...</option>
+                            <option value="1">📅 Mensal - R$ 99.99</option>
+                            <option value="2">📆 Anual - R$ 129.99</option>
+                        </select>
+                    </div>
+                    <button type="submit">Cadastrar</button>
+                </form>
+                <div id="alunoAlert"></div>
+            </div>
+
+            <!-- Card 2: Listar Alunos -->
+            <div class="card">
+                <h2>👥 Alunos Inscritos</h2>
+                <button onclick="carregarAlunos()" style="margin-bottom: 15px;">🔄 Atualizar Lista</button>
+                <div id="listaAlunos" class="students-list"></div>
+            </div>
+
+            <!-- Card 3: Calcular IMC -->
+            <div class="card">
+                <h2>⚖️ Cálculo de IMC</h2>
+                <div class="form-group">
+                    <label>ID do Aluno</label>
+                    <input type="number" id="alunoIdIMC" placeholder="Ex: 1">
+                </div>
+                <button onclick="calcularIMC()">Calcular</button>
+                <div id="imcResultado" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Card 4: Faturamento -->
+            <div class="card">
+                <h2>💰 Faturamento Total</h2>
+                <button onclick="carregarFaturamento()" style="margin-bottom: 15px;">💹 Carregar</button>
+                <div id="faturamentoResultado"></div>
+            </div>
+
+            <!-- Card 5: Trocar Plano -->
+            <div class="card">
+                <h2>🔄 Atualizar Plano</h2>
+                <div class="form-group">
+                    <label>ID do Aluno</label>
+                    <input type="number" id="alunoIdPlano" placeholder="Ex: 1">
+                </div>
+                <div class="form-group">
+                    <label>Novo Plano</label>
+                    <select id="novoPlano" required>
+                        <option value="">Selecione...</option>
+                        <option value="1">📅 Mensal - R$ 99.99</option>
+                        <option value="2">📆 Anual - R$ 129.99</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="trocarPlano()">Atualizar</button>
+                <div id="planoAlert"></div>
+            </div>
+
+            <!-- Card 6: Deletar Aluno -->
+            <div class="card">
+                <h2>🗑️ Remover Aluno</h2>
+                <div class="form-group">
+                    <label>ID do Aluno</label>
+                    <input type="number" id="alunoIdDelete" placeholder="Ex: 1">
+                </div>
+                <button class="btn-delete" onclick="deletarAluno()">Deletar</button>
+                <div id="deleteAlert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        let token = localStorage.getItem('apiToken') || '';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (token) {
+                document.getElementById('apiToken').value = token;
+            }
+            carregarAlunos();
+        });
+
+        function salvarToken() {
+            const novoToken = document.getElementById('apiToken').value.trim();
+            if (!novoToken) {
+                mostrarAlertaEmElemento('❌ Digite um token válido', 'error', 'tokenAlert');
+                return;
+            }
+            token = novoToken;
+            localStorage.setItem('apiToken', token);
+            alert('✅ Token salvo com sucesso!\n\nVocê pode agora usar a API.');
+        }
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'x-internal-token': token
+            };
+        }
+
+        async function criarAluno(e) {
+            e.preventDefault();
+            
+            if (!token) {
+                mostrarAlertaEmElemento('❌ Defina um token primeiro!', 'error', 'alunoAlert');
+                return;
+            }
+
+            const dados = {
+                nome: document.getElementById('nomeAluno').value,
+                peso: parseFloat(document.getElementById('pesoAluno').value),
+                altura: parseFloat(document.getElementById('alturaAluno').value),
+                plano_id: parseInt(document.getElementById('planoAluno').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(dados)
+                });
+
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    mostrarAlertaEmElemento('✅ ' + resultado.mensagem, 'success', 'alunoAlert');
+                    document.querySelector('form').reset();
+                    carregarAlunos();
+                } else {
+                    mostrarAlertaEmElemento('❌ ' + (resultado.erro || 'Erro ao cadastrar'), 'error', 'alunoAlert');
+                }
+            } catch (erro) {
+                mostrarAlertaEmElemento('❌ Erro de conexão com a API', 'error', 'alunoAlert');
+            }
+        }
+
+        async function carregarAlunos() {
+            const container = document.getElementById('listaAlunos');
+            
+            if (!token) {
+                container.innerHTML = '<div class="empty-state">🔒 Configure o token para carregar os alunos</div>';
+                return;
+            }
+
+            container.innerHTML = '<div class="empty-state"><div class="loading"></div><p>Carregando...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos`, {
+                    headers: getHeaders()
+                });
+
+                const alunos = await response.json();
+
+                if (response.ok && alunos.length > 0) {
+                    container.innerHTML = '';
+                    alunos.forEach(aluno => {
+                        const div = document.createElement('div');
+                        div.className = 'student-item';
+                        
+                        const classeIMC = obterClasseIMC(aluno.categoria_imc);
+                        const categoria = aluno.categoria_imc;
+
+                        div.innerHTML = `
+                            <h4>📍 ${aluno.nome}</h4>
+                            <div class="student-info">
+                                <div class="info-field">
+                                    <span class="info-label">ID</span>
+                                    <span class="info-value">#${aluno.id}</span>
+                                </div>
+                                <div class="info-field">
+                                    <span class="info-label">Peso</span>
+                                    <span class="info-value">${aluno.peso} kg</span>
+                                </div>
+                                <div class="info-field">
+                                    <span class="info-label">Altura</span>
+                                    <span class="info-value">${aluno.altura} m</span>
+                                </div>
+                                <div class="info-field">
+                                    <span class="info-label">Plano</span>
+                                    <span class="info-value">${aluno.plano_id === 1 ? '📅 Mensal' : '📆 Anual'}</span>
+                                </div>
+                            </div>
+                            <span class="imc-badge ${classeIMC}">IMC: ${aluno.imc} - ${categoria}</span>
+                            <div class="student-actions">
+                                <button onclick="document.getElementById('alunoIdIMC').value = ${aluno.id}; calcularIMC();">Ver IMC</button>
+                                <button class="btn-secondary" onclick="document.getElementById('alunoIdPlano').value = ${aluno.id};">Plano</button>
+                                <button class="btn-delete" onclick="if(confirm('Deletar ${aluno.nome}?')) { document.getElementById('alunoIdDelete').value = ${aluno.id}; deletarAluno(); }">Deletar</button>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else if (response.ok) {
+                    container.innerHTML = '<div class="empty-state">📋 Nenhum aluno cadastrado ainda</div>';
+                } else {
+                    container.innerHTML = '<div class="empty-state alert alert-error">❌ Erro ao carregar alunos</div>';
+                }
+            } catch (erro) {
+                container.innerHTML = '<div class="empty-state alert alert-error">❌ Erro de conexão</div>';
+            }
+        }
+
+        async function calcularIMC() {
+            const alunoId = document.getElementById('alunoIdIMC').value;
+            
+            if (!alunoId) {
+                mostrarAlertaEmElemento('❌ Digite o ID do aluno', 'error', 'imcResultado');
+                return;
+            }
+
+            if (!token) {
+                mostrarAlertaEmElemento('❌ Defina um token primeiro!', 'error', 'imcResultado');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos/${alunoId}/imc`, {
+                    headers: getHeaders()
+                });
+
+                const resultado = await response.json();
+                const container = document.getElementById('imcResultado');
+
+                if (response.ok) {
+                    const classeIMC = obterClasseIMC(resultado.categoria);
+                    container.innerHTML = `
+                        <div class="imc-badge ${classeIMC}">
+                            <strong>IMC: ${resultado.imc}</strong><br>
+                            ${resultado.categoria}
+                        </div>
+                    `;
+                } else {
+                    mostrarAlertaEmElemento('❌ ' + resultado.erro, 'error', 'imcResultado');
+                }
+            } catch (erro) {
+                mostrarAlertaEmElemento('❌ Erro ao calcular IMC', 'error', 'imcResultado');
+            }
+        }
+
+        async function carregarFaturamento() {
+            if (!token) {
+                mostrarAlertaEmElemento('❌ Defina um token primeiro!', 'error', 'faturamentoResultado');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/faturamento`, {
+                    headers: getHeaders()
+                });
+
+                const resultado = await response.json();
+                const container = document.getElementById('faturamentoResultado');
+
+                if (response.ok) {
+                    const valor = new Intl.NumberFormat('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    }).format(resultado.faturamento_total);
+
+                    container.innerHTML = `
+                        <div class="stat-box">
+                            <h3>${valor}</h3>
+                            <p>Faturamento Mensal Total</p>
+                        </div>
+                    `;
+                } else {
+                    mostrarAlertaEmElemento('❌ ' + resultado.erro, 'error', 'faturamentoResultado');
+                }
+            } catch (erro) {
+                mostrarAlertaEmElemento('❌ Erro ao carregar faturamento', 'error', 'faturamentoResultado');
+            }
+        }
+
+        async function trocarPlano() {
+            const alunoId = document.getElementById('alunoIdPlano').value;
+            const novoPlano = document.getElementById('novoPlano').value;
+
+            if (!alunoId || !novoPlano) {
+                mostrarAlertaEmElemento('❌ Preencha todos os campos', 'error', 'planoAlert');
+                return;
+            }
+
+            if (!token) {
+                mostrarAlertaEmElemento('❌ Defina um token primeiro!', 'error', 'planoAlert');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos/${alunoId}/trocar_plano`, {
+                    method: 'PUT',
+                    headers: getHeaders(),
+                    body: JSON.stringify({ plano_id: parseInt(novoPlano) })
+                });
+
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    mostrarAlertaEmElemento('✅ ' + resultado.mensagem, 'success', 'planoAlert');
+                    document.getElementById('alunoIdPlano').value = '';
+                    document.getElementById('novoPlano').value = '';
+                    carregarAlunos();
+                } else {
+                    mostrarAlertaEmElemento('❌ ' + resultado.erro, 'error', 'planoAlert');
+                }
+            } catch (erro) {
+                mostrarAlertaEmElemento('❌ Erro ao trocar plano', 'error', 'planoAlert');
+            }
+        }
+
+        async function deletarAluno() {
+            const alunoId = document.getElementById('alunoIdDelete').value;
+
+            if (!alunoId) {
+                mostrarAlertaEmElemento('❌ Digite o ID do aluno', 'error', 'deleteAlert');
+                return;
+            }
+
+            if (!token) {
+                mostrarAlertaEmElemento('❌ Defina um token primeiro!', 'error', 'deleteAlert');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/alunos/${alunoId}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+
+                const resultado = await response.json();
+
+                if (response.ok) {
+                    mostrarAlertaEmElemento('✅ ' + resultado.mensagem, 'success', 'deleteAlert');
+                    document.getElementById('alunoIdDelete').value = '';
+                    carregarAlunos();
+                } else {
+                    mostrarAlertaEmElemento('❌ ' + resultado.erro, 'error', 'deleteAlert');
+                }
+            } catch (erro) {
+                mostrarAlertaEmElemento('❌ Erro ao deletar aluno', 'error', 'deleteAlert');
+            }
+        }
+
+        function obterClasseIMC(categoria) {
+            switch(categoria) {
+                case 'Peso ideal': return 'imc-normal';
+                case 'Sobrepeso': return 'imc-overweight';
+                case 'Obesidade': return 'imc-obesity';
+                case 'Abaixo do peso': return 'imc-underweight';
+                default: return 'imc-normal';
+            }
+        }
+
+        function mostrarAlertaEmElemento(mensagem, tipo, elementoId) {
+            const elemento = document.getElementById(elementoId);
+            elemento.innerHTML = `<div class="alert alert-${tipo}">${mensagem}</div>`;
+            setTimeout(() => {
+                elemento.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
