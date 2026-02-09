@@ -1,5 +1,5 @@
 import os  
-from flask import Flask
+from flask import Flask, render_template
 from flask_cors import CORS
 from controllers.routes import api
 from db import criar_tabelas
@@ -11,6 +11,10 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 app.register_blueprint(api)
+
+@app.get("/")
+def home():
+    return render_template("index.html")
 
 criar_tabelas()
 
