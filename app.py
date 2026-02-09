@@ -15,7 +15,5 @@ app.register_blueprint(api)
 criar_tabelas()
 
 if __name__ == "__main__":
-    
-    token = os.getenv('INTERNAL_API_TOKEN')
-    print(f"SISTEMA: Token '{token}' carregado com sucesso.")
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
